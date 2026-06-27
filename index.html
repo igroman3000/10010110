@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CyberCapture Static Key</title>
     <style>
-        /* Полное повторение темного дизайна C# окна */
+        /* Полное погружение в неоновый киберпанк-стиль */
         body {
-            background-color: #141414;
+            background-color: #0a0a0c;
             color: #ffffff;
             font-family: Arial, sans-serif;
             display: flex;
@@ -15,79 +15,133 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden;
         }
+        
+        /* Окно программы со скругленными краями, неоновой рамкой и свечением */
         .window {
-            background-color: #141414;
-            border: 1px solid #333333;
+            background-color: #111115;
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 15px #00ffff, inset 0 0 10px rgba(0, 255, 255, 0.2);
             width: 400px;
-            padding: 20px;
+            padding: 25px;
             box-sizing: border-box;
+            border-radius: 12px; /* Мягкие скругленные края окна */
         }
+        
+        /* Заголовки блоков с легким неоновым сиянием */
         .title {
             font-size: 11px;
             font-weight: bold;
-            color: #808080;
+            color: #888899;
             margin-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 15px;
+            letter-spacing: 1px;
+            margin-top: 20px;
         }
         .title:first-child {
             margin-top: 0;
         }
-        /* Поле вывода маркера */
+        
+        /* Поле вывода маркера со скругленными углами */
         .marker-box {
             width: 100%;
-            background-color: #1e1e1e;
-            border: 1px solid #1e1e1e;
+            background-color: #16161e;
+            border: 1px solid #00ffff;
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
             color: #00ffff;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
             font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: bold;
-            padding: 6px 10px;
+            padding: 8px 10px;
             box-sizing: border-box;
             margin-bottom: 15px;
+            text-align: center;
+            border-radius: 8px; /* Скругление поля маркера */
         }
-        /* Кнопка общего стиля */
+        
+        /* Базовый класс для кнопок действий */
         .btn-action {
             width: 100%;
             border: none;
-            padding: 10px;
+            padding: 11px;
             font-size: 12px;
             font-weight: bold;
             cursor: pointer;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             text-transform: uppercase;
-            transition: background-color 0.2s;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            border-radius: 8px; /* Скругление всех основных кнопок */
         }
-        /* Кнопка копирования */
+        
+        /* Кнопка копирования (Залитая неоном) */
         #copyBtn {
             background-color: #00ffff;
             color: #000000;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+        }
+        #copyBtn:hover {
+            background-color: #ffffff;
+            box-shadow: 0 0 15px #ffffff;
         }
         #copyBtn.copied {
-            background-color: #32cd32 !important;
-        }
-        /* Кнопка скачивания exe */
-        .btn-download {
-            background-color: #ffaa00;
+            background-color: #39ff14 !important; /* Кислотно-зеленый при успехе */
+            box-shadow: 0 0 15px #39ff14 !important;
             color: #000000;
+        }
+        
+        /* Кнопка генерации (Темная с неоновой рамкой) */
+        #regenBtn {
+            background-color: transparent;
+            color: #ffffff;
+            border: 1px solid #555566;
+            margin-bottom: 15px;
+        }
+        #regenBtn:hover {
+            border-color: #00ffff;
+            color: #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        /* Кнопка скачивания exe (Огненно-оранжевый неон со скруглением) */
+        .btn-download {
+            background-color: transparent;
+            color: #ff5500;
+            border: 1px solid #ff5500;
             text-decoration: none;
             display: block;
             text-align: center;
             box-sizing: border-box;
+            box-shadow: inset 0 0 5px rgba(255, 85, 0, 0.2);
         }
-        /* Кнопка выхода */
+        .btn-download:hover {
+            background-color: #ff5500;
+            color: #000000;
+            box-shadow: 0 0 15px #ff5500;
+        }
+        
+        /* Кнопка выхода (Кроваво-красный неон со скруглением) */
         .btn-close {
             display: block;
-            width: 120px;
-            margin: 20px auto 0 auto;
-            background-color: #2d2d2d;
-            color: #ffffff;
-            border: none;
-            padding: 10px;
-            font-size: 13px;
+            width: 130px;
+            margin: 25px auto 0 auto;
+            background-color: transparent;
+            color: #ff0055;
+            border: 1px solid #ff0055;
+            padding: 8px;
+            font-size: 12px;
+            font-weight: bold;
             cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            border-radius: 8px; /* Скругление кнопки выхода */
+        }
+        .btn-close:hover {
+            background-color: #ff0055;
+            color: #ffffff;
+            box-shadow: 0 0 12px #ff0055;
         }
     </style>
 </head>
@@ -95,47 +149,58 @@
 
 <div class="window">
     <div class="title">Уникальный генерируемый маркер:</div>
-    <!-- Поле для маркера, текст readonly но его можно выделить руками -->
     <input type="text" id="markerField" class="marker-box" readonly>
     
-    <button id="copyBtn" class="btn-action">Копировать</button>
+    <button id="copyBtn" class="btn-action">Копировать маркер</button>
+    <button id="regenBtn" class="btn-action">Сгенерировать новый</button>
     
-    <!-- БЛОК ДЛЯ СКАЧИВАНИЯ ФАЙЛА ПО ТОЧНОЙ ССЫЛКЕ -->
     <div class="title">Приложение RandomMarker:</div>
-    <a href="https://igroman3000.github.io/10010110/RandomMarker.exe" download="RandomMarker.exe" class="btn-action btn-download">Скачать RandomMarker.exe</a>
+    <a href="https://github.io" download="RandomMarker.exe" class="btn-action btn-download">Скачать RandomMarker.exe</a>
     
-    <!-- ИСПРАВЛЕННАЯ КНОПКА ВЫХОДА -->
     <button class="btn-close" id="closeBtn">Выход</button>
 </div>
 
 <script>
-    // Функция для генерации случайного HEX-блока из 4 символов
+    // Генерация случайного HEX-блока из 4 символов
     function getRandomHex() {
         return Math.floor(Math.random() * 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
     }
 
-    // Генерация одного статичного маркера при загрузке страницы
+    // Функция генерации полного ключа
     const markerField = document.getElementById('markerField');
-    const uniqueKey = `KEY-${getRandomHex()}-${getRandomHex()}-${getRandomHex()}-${getRandomHex()}`;
-    markerField.value = uniqueKey;
+    function generateNewKey() {
+        markerField.value = `KEY-${getRandomHex()}-${getRandomHex()}-${getRandomHex()}-${getRandomHex()}`;
+    }
 
-    // Логика кнопки автоматического копирования
+    // Генерируем первый ключ при входе на страницу
+    generateNewKey();
+
+    // Кнопка перегенерации
+    document.getElementById('regenBtn').addEventListener('click', generateNewKey);
+
+    // Логика кнопки копирования с таймером возврата в исходный режим
     const copyBtn = document.getElementById('copyBtn');
+    let resetTimeout;
+    
     copyBtn.addEventListener('click', () => {
         markerField.select();
-        markerField.setSelectionRange(0, 99999); // Для мобильных устройств
+        markerField.setSelectionRange(0, 99999); // Защита для смартфонов
         
         navigator.clipboard.writeText(markerField.value).then(() => {
-            copyBtn.textContent = 'Готово! Ключ в буфере';
+            copyBtn.textContent = 'Скопировано в буфер!';
             copyBtn.classList.add('copied');
+            
+            clearTimeout(resetTimeout);
+            resetTimeout = setTimeout(() => {
+                copyBtn.textContent = 'Копировать маркер';
+                copyBtn.classList.remove('copied');
+            }, 1500);
         });
     });
 
-    // Рабочая логика для закрытия/ухода со страницы
+    // Логика кнопки выхода
     document.getElementById('closeBtn').addEventListener('click', () => {
-        // Пробуем закрыть стандартным методом (сработает, если страница была открыта скриптом)
         window.close();
-        // Если вкладку запрещено закрывать, мгновенно уводим пользователя на чистую страницу
         setTimeout(() => {
             window.location.href = "about:blank";
         }, 100);
