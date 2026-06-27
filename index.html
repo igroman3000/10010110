@@ -100,11 +100,12 @@
     
     <button id="copyBtn" class="btn-action">Копировать</button>
     
-    <!-- БЛОК ДЛЯ СКАЧИВАНИЯ ФАЙЛА ПО ПРЯМОЙ ССЫЛКЕ -->
+    <!-- БЛОК ДЛЯ СКАЧИВАНИЯ ФАЙЛА ПО ТОЧНОЙ ССЫЛКЕ -->
     <div class="title">Приложение RandomMarker:</div>
-    <a href="https://github.com/igroman3000/10010110/RandomMarker.exe" download="RandomMarker.exe" class="btn-action btn-download">Скачать RandomMarker.exe</a>
+    <a href="https://igroman3000.github.io/10010110/RandomMarker.exe" download="RandomMarker.exe" class="btn-action btn-download">Скачать RandomMarker.exe</a>
     
-    <button class="btn-close" onclick="window.close();">Выход</button>
+    <!-- ИСПРАВЛЕННАЯ КНОПКА ВЫХОДА -->
+    <button class="btn-close" id="closeBtn">Выход</button>
 </div>
 
 <script>
@@ -128,6 +129,16 @@
             copyBtn.textContent = 'Готово! Ключ в буфере';
             copyBtn.classList.add('copied');
         });
+    });
+
+    // Рабочая логика для закрытия/ухода со страницы
+    document.getElementById('closeBtn').addEventListener('click', () => {
+        // Пробуем закрыть стандартным методом (сработает, если страница была открыта скриптом)
+        window.close();
+        // Если вкладку запрещено закрывать, мгновенно уводим пользователя на чистую страницу
+        setTimeout(() => {
+            window.location.href = "about:blank";
+        }, 100);
     });
 </script>
 
