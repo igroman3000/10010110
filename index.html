@@ -30,6 +30,10 @@
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin-top: 15px;
+        }
+        .title:first-child {
+            margin-top: 0;
         }
         /* Поле вывода маркера */
         .marker-box {
@@ -42,30 +46,42 @@
             font-weight: bold;
             padding: 6px 10px;
             box-sizing: border-box;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
-        /* Кнопка копирования */
-        .btn-copy {
+        /* Кнопка общего стиля */
+        .btn-action {
             width: 100%;
-            background-color: #00ffff;
-            color: #000000;
             border: none;
             padding: 10px;
             font-size: 12px;
             font-weight: bold;
             cursor: pointer;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
             text-transform: uppercase;
             transition: background-color 0.2s;
         }
-        .btn-copy.copied {
+        /* Кнопка копирования */
+        #copyBtn {
+            background-color: #00ffff;
+            color: #000000;
+        }
+        #copyBtn.copied {
             background-color: #32cd32 !important;
         }
-        /* Кнопка выхода (просто закрывает вкладку) */
+        /* Кнопка скачивания exe */
+        .btn-download {
+            background-color: #ffff00;
+            color: #000000;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        /* Кнопка выхода */
         .btn-close {
             display: block;
             width: 120px;
-            margin: 0 auto;
+            margin: 20px auto 0 auto;
             background-color: #2d2d2d;
             color: #ffffff;
             border: none;
@@ -82,13 +98,17 @@
     <!-- Поле для маркера, текст readonly но его можно выделить руками -->
     <input type="text" id="markerField" class="marker-box" readonly>
     
-    <button id="copyBtn" class="btn-copy">Копировать</button>
+    <button id="copyBtn" class="btn-action">Копировать</button>
+    
+    <!-- НОВЫЙ БЛОК ДЛЯ СКАЧИВАНИЯ ФАЙЛА -->
+    <div class="title">Приложение RandomMarker:</div>
+    <a href="RandomMarker.exe" download="RandomMarker.exe" class="btn-action btn-download">Скачать RandomMarker.exe</a>
     
     <button class="btn-close" onclick="window.close();">Выход</button>
 </div>
 
 <script>
-    // Функция для генерации случайного HEX-блока из 4 символов
+    // Функция для generation случайного HEX-блока из 4 символов
     function getRandomHex() {
         return Math.floor(Math.random() * 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
     }
@@ -98,7 +118,7 @@
     const uniqueKey = `KEY-${getRandomHex()}-${getRandomHex()}-${getRandomHex()}-${getRandomHex()}`;
     markerField.value = uniqueKey;
 
-    // Логика кнопки автоматического копирования
+    // Логика кнопки автоматического копирования (исправлена синтаксическая ошибка)
     const copyBtn = document.getElementById('copyBtn');
     copyBtn.addEventListener('click', () => {
         // Выделяем и копируем текст в буфер обмена
@@ -113,5 +133,5 @@
     });
 </script>
 
-</body>
+</body> 
 </html>
