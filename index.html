@@ -57,8 +57,6 @@
         }
         #genBtn { background-color: #00ffff; color: #000000; }
         #decodeBtn { background-color: #ffff00; color: #000000; }
-        
-        /* Изменили div на многострочное текстовое поле с возможностью выделения */
         .result-area {
             width: 100%;
             background-color: #1a1a1a;
@@ -99,7 +97,7 @@
     <input type="text" id="keyInput" class="input-box" placeholder="KEY-XXXX-XXXX-XXXX-XXXX">
     <button id="decodeBtn" class="btn">Дешифровать и проверить</button>
     
-    <div class="title">Результат дешифрации (можно выделить и скопировать):</div>
+    <div class="title">Результат дешифрации (сплошной код):</div>
     <textarea id="resultArea" class="result-area" readonly>Ожидание ввода ключа для анализа...</textarea>
     
     <button class="btn-close" onclick="window.close();">Выход</button>
@@ -152,17 +150,17 @@
 
         const b1 = parseInt(parts[1], 16);
         const b2 = parseInt(parts[2], 16);
-        const b3 = parseInt(parts[3], 16);
+        const b3 = parseInt(parts, 16);
         const b4 = parseInt(parts[4], 16);
+
+        // Склеиваем блоки без дефисов
+        const cleanFullCode = "KEY-" + parts[1] + parts[2] + parts[3] + parts[4];
 
         resultArea.style.color = "#32cd32";
         resultArea.value = 
             `СТАТУС: УСПЕШНО ДЕШИФРОВАН\n\n` +
-            `Оригинальный ключ: ${input}\n\n` +
-            `Блок 1 (DEC): ${b1}\n` +
-            `Блок 2 (DEC): ${b2}\n` +
-            `Блок 3 (DEC): ${b3}\n` +
-            `Блок 4 (DEC): ${b4}`;
+            `Дешифрованный сплошной код:\n${cleanFullCode}\n\n` +
+            `Блоки (DEC): ${b1}, ${b2}, ${b3}, ${b4}`;
     });
 </script>
 
