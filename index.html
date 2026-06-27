@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberCapture Key Decoder</title>
+    <title>RandomMarker: All in One</title>
     <style>
         body {
             background-color: #141414;
@@ -26,45 +26,52 @@
             font-size: 11px;
             font-weight: bold;
             color: #808080;
+            margin-top: 15px;
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+        .title:first-child { margin-top: 0; }
         .input-box {
             width: 100%;
             background-color: #1e1e1e;
             border: 1px solid #333333;
-            color: #00ffff;
             font-family: 'Courier New', Courier, monospace;
             font-size: 14px;
             font-weight: bold;
             padding: 8px 10px;
             box-sizing: border-box;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
-        .btn-decode {
+        #outField { color: #00ffff; }
+        #keyInput { color: #ffff00; }
+        .btn {
             width: 100%;
-            background-color: #00ffff;
-            color: #000000;
             border: none;
             padding: 10px;
             font-size: 12px;
             font-weight: bold;
             cursor: pointer;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-transform: uppercase;
         }
+        #genBtn { background-color: #00ffff; color: #000000; }
+        #decodeBtn { background-color: #ffff00; color: #000000; }
+        
+        /* Изменили div на многострочное текстовое поле с возможностью выделения */
         .result-area {
+            width: 100%;
             background-color: #1a1a1a;
             border: 1px solid #252525;
             padding: 15px;
             font-family: 'Courier New', Courier, monospace;
             font-size: 13px;
-            min-height: 110px;
+            height: 130px;
             box-sizing: border-box;
             margin-bottom: 20px;
             white-space: pre-wrap;
             color: #aaaaaa;
+            resize: none;
         }
         .btn-close {
             display: block;
@@ -82,55 +89,76 @@
 <body>
 
 <div class="window">
-    <div class="title">Вставьте маркер для дешифровки:</div>
+    <!-- ГЕНЕРАТОР -->
+    <div class="title">Раздел 1: Генератор ключей</div>
+    <input type="text" id="outField" class="input-box" placeholder="Кликните Сгенерировать..." readonly>
+    <button id="genBtn" class="btn">Сгенерировать и копировать</button>
+    
+    <!-- ДЕШИФРОВАТЬ -->
+    <div class="title">Раздел 2: Дешифратор ключей</div>
     <input type="text" id="keyInput" class="input-box" placeholder="KEY-XXXX-XXXX-XXXX-XXXX">
+    <button id="decodeBtn" class="btn">Дешифровать и проверить</button>
     
-    <button id="decodeBtn" class="btn-decode">Дешифровать и проверить</button>
-    
-    <div class="title">Результат анализа:</div>
-    <div id="resultArea" class="result-area">Ожидание ввода...</div>
+    <div class="title">Результат дешифрации (можно выделить и скопировать):</div>
+    <textarea id="resultArea" class="result-area" readonly>Ожидание ввода ключа для анализа...</textarea>
     
     <button class="btn-close" onclick="window.close();">Выход</button>
 </div>
 
 <script>
+    function getRandomHex() {
+        return Math.floor(Math.random() * 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+    }
+
+    const genBtn = document.getElementById('genBtn');
+    const outField = document.getElementById('outField');
+    
+    genBtn.addEventListener('click', () => {
+        const uniqueKey = `KEY-${getRandomHex()}-${getRandomHex()}-${getRandomHex()}-${getRandomHex()}`;
+        outField.value = uniqueKey;
+        
+        navigator.clipboard.writeText(uniqueKey).then(() => {
+            genBtn.textContent = 'Готово! Ключ в буфере';
+            genBtn.style.backgroundColor = '#32cd32';
+        });
+    });
+
     document.getElementById('decodeBtn').addEventListener('click', () => {
+        genBtn.textContent = 'Сгенерировать и копировать';
+        genBtn.style.backgroundColor = '#00ffff';
+
         const input = document.getElementById('keyInput').value.trim().toUpperCase();
         const resultArea = document.getElementById('resultArea');
         
         if (!input) {
-            resultArea.textContent = "Ошибка: Поле ввода пустое.";
+            resultArea.value = "Ошибка: Поле ввода пустое.";
             resultArea.style.color = "#ff4500";
             return;
         }
 
         const parts = input.split('-');
-        
-        // Валидация структуры
         if (parts.length !== 5 || parts[0] !== 'KEY') {
-            resultArea.textContent = "СТАТУС: ОШИБКА\n\nНеверный формат структуры.\nШаблон: KEY-XXXX-XXXX-XXXX-XXXX";
+            resultArea.value = "СТАТУС: ОШИБКА\n\nНеверный формат.\nШаблон: KEY-XXXX-XXXX-XXXX-XXXX";
             resultArea.style.color = "#ff4500";
             return;
         }
 
-        // Регулярное выражение для проверки шестнадцатеричных символов (0-9, A-F)
         const hexRegex = /^[0-9A-F]{4}$/;
         if (!hexRegex.test(parts[1]) || !hexRegex.test(parts[2]) || !hexRegex.test(parts[3]) || !hexRegex.test(parts[4])) {
-            resultArea.textContent = "СТАТУС: КРИТИЧЕСКАЯ ОШИБКА\n\nОбнаружены недопустимые не-HEX символы в блоках ключа.";
+            resultArea.value = "СТАТУС: КРИТИЧЕСКАЯ ОШИБКА\n\nОбнаружены недопустимые не-HEX символы.";
             resultArea.style.color = "#ff4500";
             return;
         }
 
-        // Парсинг блоков
         const b1 = parseInt(parts[1], 16);
         const b2 = parseInt(parts[2], 16);
         const b3 = parseInt(parts[3], 16);
         const b4 = parseInt(parts[4], 16);
 
         resultArea.style.color = "#32cd32";
-        resultArea.textContent = 
+        resultArea.value = 
             `СТАТУС: УСПЕШНО ДЕШИФРОВАН\n\n` +
-            `Структура: Валидна\n` +
+            `Оригинальный ключ: ${input}\n\n` +
             `Блок 1 (DEC): ${b1}\n` +
             `Блок 2 (DEC): ${b2}\n` +
             `Блок 3 (DEC): ${b3}\n` +
