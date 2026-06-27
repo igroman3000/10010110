@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RandomMarker: All in One</title>
+    <title>CyberCapture Static Key</title>
     <style>
         /* Полное повторение темного дизайна C# окна */
         body {
@@ -13,15 +13,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
         }
         .window {
             background-color: #141414;
             border: 1px solid #333333;
-            width: 440px;
+            width: 400px;
             padding: 20px;
             box-sizing: border-box;
         }
@@ -29,26 +27,29 @@
             font-size: 11px;
             font-weight: bold;
             color: #808080;
-            margin-top: 15px;
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin-top: 15px;
         }
-        .title:first-child { margin-top: 0; }
-        .input-box {
+        .title:first-child {
+            margin-top: 0;
+        }
+        /* Поле вывода маркера */
+        .marker-box {
             width: 100%;
             background-color: #1e1e1e;
-            border: 1px solid #333333;
+            border: 1px solid #1e1e1e;
+            color: #00ffff;
             font-family: 'Courier New', Courier, monospace;
             font-size: 14px;
             font-weight: bold;
-            padding: 8px 10px;
+            padding: 6px 10px;
             box-sizing: border-box;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
-        #outField { color: #00ffff; }
-        #keyInput { color: #ffff00; }
-        .btn {
+        /* Кнопка общего стиля */
+        .btn-action {
             width: 100%;
             border: none;
             padding: 10px;
@@ -59,11 +60,15 @@
             text-transform: uppercase;
             transition: background-color 0.2s;
         }
-        #genBtn { background-color: #00ffff; color: #000000; }
-        #genBtn.copied { background-color: #32cd32 !important; }
-        #decodeBtn { background-color: #ffff00; color: #000000; }
-        
-        /* Кнопка скачивания exe по внешней ссылке */
+        /* Кнопка копирования */
+        #copyBtn {
+            background-color: #00ffff;
+            color: #000000;
+        }
+        #copyBtn.copied {
+            background-color: #32cd32 !important;
+        }
+        /* Кнопка скачивания exe */
         .btn-download {
             background-color: #ffaa00;
             color: #000000;
@@ -72,24 +77,11 @@
             text-align: center;
             box-sizing: border-box;
         }
-        .result-area {
-            width: 100%;
-            background-color: #1a1a1a;
-            border: 1px solid #252525;
-            padding: 15px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 13px;
-            height: 160px;
-            box-sizing: border-box;
-            margin-bottom: 20px;
-            white-space: pre-wrap;
-            color: #aaaaaa;
-            resize: none;
-        }
+        /* Кнопка выхода */
         .btn-close {
             display: block;
             width: 120px;
-            margin: 0 auto;
+            margin: 20px auto 0 auto;
             background-color: #2d2d2d;
             color: #ffffff;
             border: none;
@@ -102,120 +94,42 @@
 <body>
 
 <div class="window">
-    <!-- ГЕНЕРАТОР -->
-    <div class="title">Раздел 1: Генератор уникальных маркеров</div>
-    <input type="text" id="outField" class="input-box" placeholder="Кликните Сгенерировать..." readonly>
-    <button id="genBtn" class="btn">Сгенерировать и копировать</button>
+    <div class="title">Уникальный генерируемый маркер:</div>
+    <!-- Поле для маркера, текст readonly но его можно выделить руками -->
+    <input type="text" id="markerField" class="marker-box" readonly>
     
-    <!-- ДЕШИФРОВАТЬ -->
-    <div class="title">Раздел 2: Универсальный дешифратор (UTF-8 + ANSI)</div>
-    <input type="text" id="keyInput" class="input-box" placeholder="KEY-XXXX-XXXX-XXXX-XXXX">
-    <button id="decodeBtn" class="btn">Дешифровать во всех кодировках</button>
+    <button id="copyBtn" class="btn-action">Копировать</button>
     
-    <div class="title">Результаты анализа баланса кодировок:</div>
-    <textarea id="resultArea" class="result-area" readonly>Ожидание ввода ключа для анализа...</textarea>
-
-    <!-- СКАЧАТЬ EXE -->
+    <!-- БЛОК ДЛЯ СКАЧИВАНИЯ ФАЙЛА ПО ПРЯМОЙ ССЫЛКЕ -->
     <div class="title">Приложение RandomMarker:</div>
-    <a href="https://igroman3000.github.io/10010110/RandomMarker.exe" download="RandomMarker.exe" class="btn btn-download">Скачать RandomMarker.exe</a>
+    <a href="https://github.io" download="RandomMarker.exe" class="btn-action btn-download">Скачать RandomMarker.exe</a>
     
     <button class="btn-close" onclick="window.close();">Выход</button>
 </div>
 
 <script>
+    // Функция для генерации случайного HEX-блока из 4 символов
     function getRandomHex() {
         return Math.floor(Math.random() * 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
     }
 
-    const genBtn = document.getElementById('genBtn');
-    const outField = document.getElementById('outField');
-    
-    // Автоматическая генерация при первой загрузке страницы
+    // Генерация одного статичного маркера при загрузке страницы
+    const markerField = document.getElementById('markerField');
     const uniqueKey = `KEY-${getRandomHex()}-${getRandomHex()}-${getRandomHex()}-${getRandomHex()}`;
-    outField.value = uniqueKey;
+    markerField.value = uniqueKey;
 
-    genBtn.addEventListener('click', () => {
-        // Копируем уже созданный или новый маркер
-        markerField = document.getElementById('outField');
+    // Логика кнопки автоматического копирования
+    const copyBtn = document.getElementById('copyBtn');
+    copyBtn.addEventListener('click', () => {
         markerField.select();
-        markerField.setSelectionRange(0, 99999);
+        markerField.setSelectionRange(0, 99999); // Для мобильных устройств
         
-        navigator.clipboard.writeText(outField.value).then(() => {
-            genBtn.textContent = 'Готово! Ключ в буфере';
-            genBtn.classList.add('copied');
+        navigator.clipboard.writeText(markerField.value).then(() => {
+            copyBtn.textContent = 'Готово! Ключ в буфере';
+            copyBtn.classList.add('copied');
         });
-    });
-
-    document.getElementById('decodeBtn').addEventListener('click', () => {
-        genBtn.textContent = 'Сгенерировать и копировать';
-        genBtn.style.backgroundColor = '#00ffff';
-        genBtn.classList.remove('copied');
-
-        const input = document.getElementById('keyInput').value.trim().toUpperCase();
-        const resultArea = document.getElementById('resultArea');
-        
-        if (!input) {
-            resultArea.value = "Ошибка: Поле ввода пустое.";
-            resultArea.style.color = "#ff4500";
-            return;
-        }
-
-        const parts = input.split('-');
-        if (parts.length !== 5 || parts[0] !== 'KEY') {
-            resultArea.value = "СТАТУС: ОШИБКА\n\nНеверный формат.\nШаблон: KEY-XXXX-XXXX-XXXX-XXXX";
-            resultArea.style.color = "#ff4500";
-            return;
-        }
-
-        const hexRegex = /^[0-9A-F]{4}$/;
-        if (!hexRegex.test(parts[1]) || !hexRegex.test(parts[2]) || !hexRegex.test(parts[3]) || !hexRegex.test(parts[4])) {
-            resultArea.value = "СТАТУС: КРИТИЧЕСКАЯ ОШИБКА\n\nОбнаружены недопустимые не-HEX символы.";
-            resultArea.style.color = "#ff4500";
-            return;
-        }
-
-        try {
-            const hexString = parts[1] + parts[2] + parts[3] + parts[4];
-            const bytes = new Uint8Array(hexString.length / 2);
-            for (let i = 0; i < bytes.length; i++) {
-                bytes[i] = parseInt(hexString.substr(i * 2, 2), 16);
-            }
-
-            // 1. Декодирование UTF-8
-            const utf8Decoder = new TextDecoder('utf-8');
-            const utf8Text = utf8Decoder.decode(bytes);
-            let cleanUtf8 = "";
-            for (let char of utf8Text) cleanUtf8 += (char.charCodeAt(0) < 32) ? '?' : char;
-            const padUtf8 = cleanUtf8.padEnd(16, '*');
-            const keyUtf8 = `KEY-${padUtf8.substr(0,4)}-${padUtf8.substr(4,4)}-${padUtf8.substr(8,4)}-${padUtf8.substr(12,4)}`;
-
-            // 2. Декодирование ANSI (Windows-1251)
-            let ansiText = "";
-            for (let i = 0; i < 8; i++) {
-                let byteVal = bytes[i];
-                if (byteVal >= 0xC0 && byteVal <= 0xFF) ansiText += String.fromCharCode(byteVal + 0x350);
-                else if (byteVal === 0xA8) ansiText += "Ё";
-                else if (byteVal === 0xB8) ansiText += "ё";
-                else ansiText += (byteVal < 32) ? '?' : String.fromCharCode(byteVal);
-            }
-            const padAnsi = ansiText.padEnd(16, '*');
-            const keyAnsi = `KEY-${padAnsi.substr(0,4)}-${padAnsi.substr(4,4)}-${padAnsi.substr(8,4)}-${padAnsi.substr(12,4)}`;
-
-            resultArea.style.color = "#32cd32";
-            resultArea.value = 
-                `СТАТУС: УСПЕШНО РАСШИФРОВАНО\n\n` +
-                `[ВАРИАНТ UTF-8]\n` +
-                `Код : ${keyUtf8}\n` +
-                `Текст: ${cleanUtf8}\n\n` +
-                `[ВАРИАНТ ANSI]\n` +
-                `Код : ${keyAnsi}\n` +
-                `Текст: ${ansiText}`;
-        } catch(e) {
-            resultArea.value = "СТАТУС: КРИТИЧЕСКАЯ ОШИБКА\n\nОшибка обработки данных.";
-            resultArea.style.color = "#ff4500";
-        }
     });
 </script>
 
-</body>
+</body> 
 </html>
