@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberCapture Static Key</title>
+    <title>CyberCapture Key Decoder</title>
     <style>
-        /* Полное повторение темного дизайна C# окна */
         body {
             background-color: #141414;
             color: #ffffff;
@@ -19,7 +18,7 @@
         .window {
             background-color: #141414;
             border: 1px solid #333333;
-            width: 400px;
+            width: 420px;
             padding: 20px;
             box-sizing: border-box;
         }
@@ -31,21 +30,19 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        /* Поле вывода маркера */
-        .marker-box {
+        .input-box {
             width: 100%;
             background-color: #1e1e1e;
-            border: 1px solid #1e1e1e;
+            border: 1px solid #333333;
             color: #00ffff;
             font-family: 'Courier New', Courier, monospace;
             font-size: 14px;
             font-weight: bold;
-            padding: 6px 10px;
+            padding: 8px 10px;
             box-sizing: border-box;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
-        /* Кнопка копирования */
-        .btn-copy {
+        .btn-decode {
             width: 100%;
             background-color: #00ffff;
             color: #000000;
@@ -54,14 +51,21 @@
             font-size: 12px;
             font-weight: bold;
             cursor: pointer;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             text-transform: uppercase;
-            transition: background-color 0.2s;
         }
-        .btn-copy.copied {
-            background-color: #32cd32 !important;
+        .result-area {
+            background-color: #1a1a1a;
+            border: 1px solid #252525;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            min-height: 110px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+            color: #aaaaaa;
         }
-        /* Кнопка выхода (просто закрывает вкладку) */
         .btn-close {
             display: block;
             width: 120px;
@@ -78,38 +82,59 @@
 <body>
 
 <div class="window">
-    <div class="title">Уникальный генерируемый маркер:</div>
-    <!-- Поле для маркера, текст readonly но его можно выделить руками -->
-    <input type="text" id="markerField" class="marker-box" readonly>
+    <div class="title">Вставьте маркер для дешифровки:</div>
+    <input type="text" id="keyInput" class="input-box" placeholder="KEY-XXXX-XXXX-XXXX-XXXX">
     
-    <button id="copyBtn" class="btn-copy">Копировать</button>
+    <button id="decodeBtn" class="btn-decode">Дешифровать и проверить</button>
+    
+    <div class="title">Результат анализа:</div>
+    <div id="resultArea" class="result-area">Ожидание ввода...</div>
     
     <button class="btn-close" onclick="window.close();">Выход</button>
 </div>
 
 <script>
-    // Функция для генерации случайного HEX-блока из 4 символов
-    function getRandomHex() {
-        return Math.floor(Math.random() * 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
-    }
-
-    // Генерация одного статичного маркера при загрузке страницы
-    const markerField = document.getElementById('markerField');
-    const uniqueKey = `KEY-${getRandomHex()}-${getRandomHex()}-${getRandomHex()}-${getRandomHex()}`;
-    markerField.value = uniqueKey;
-
-    // Логика кнопки автоматического копирования
-    const copyBtn = document.getElementById('copyBtn');
-    copyBtn.addEventListener('click', () => {
-        // Выделяем и копируем текст в буфер обмена
-        markerField.select();
-        markerField.setSelectionRange(0, 99999); // Для мобильных устройств
+    document.getElementById('decodeBtn').addEventListener('click', () => {
+        const input = document.getElementById('keyInput').value.trim().toUpperCase();
+        const resultArea = document.getElementById('resultArea');
         
-        navigator.clipboard.writeText(markerField.value).then(() => {
-            // Эффект успешного копирования (смена текста и цвета)
-            copyBtn.textContent = 'Скопировано!';
-            copyBtn.classList.add('copied');
-        });
+        if (!input) {
+            resultArea.textContent = "Ошибка: Поле ввода пустое.";
+            resultArea.style.color = "#ff4500";
+            return;
+        }
+
+        const parts = input.split('-');
+        
+        // Валидация структуры
+        if (parts.length !== 5 || parts[0] !== 'KEY') {
+            resultArea.textContent = "СТАТУС: ОШИБКА\n\nНеверный формат структуры.\nШаблон: KEY-XXXX-XXXX-XXXX-XXXX";
+            resultArea.style.color = "#ff4500";
+            return;
+        }
+
+        // Регулярное выражение для проверки шестнадцатеричных символов (0-9, A-F)
+        const hexRegex = /^[0-9A-F]{4}$/;
+        if (!hexRegex.test(parts[1]) || !hexRegex.test(parts[2]) || !hexRegex.test(parts[3]) || !hexRegex.test(parts[4])) {
+            resultArea.textContent = "СТАТУС: КРИТИЧЕСКАЯ ОШИБКА\n\nОбнаружены недопустимые не-HEX символы в блоках ключа.";
+            resultArea.style.color = "#ff4500";
+            return;
+        }
+
+        // Парсинг блоков
+        const b1 = parseInt(parts[1], 16);
+        const b2 = parseInt(parts[2], 16);
+        const b3 = parseInt(parts[3], 16);
+        const b4 = parseInt(parts[4], 16);
+
+        resultArea.style.color = "#32cd32";
+        resultArea.textContent = 
+            `СТАТУС: УСПЕШНО ДЕШИФРОВАН\n\n` +
+            `Структура: Валидна\n` +
+            `Блок 1 (DEC): ${b1}\n` +
+            `Блок 2 (DEC): ${b2}\n` +
+            `Блок 3 (DEC): ${b3}\n` +
+            `Блок 4 (DEC): ${b4}`;
     });
 </script>
 
