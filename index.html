@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberCapture Static Key</title>
+    <style>
+        /* Полное повторение темного дизайна C# окна */
+        body {
+            background-color: #141414;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .window {
+            background-color: #141414;
+            border: 1px solid #333333;
+            width: 400px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .title {
+            font-size: 11px;
+            font-weight: bold;
+            color: #808080;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        /* Поле вывода маркера */
+        .marker-box {
+            width: 100%;
+            background-color: #1e1e1e;
+            border: 1px solid #1e1e1e;
+            color: #00ffff;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 6px 10px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+        /* Кнопка копирования */
+        .btn-copy {
+            width: 100%;
+            background-color: #00ffff;
+            color: #000000;
+            border: none;
+            padding: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            transition: background-color 0.2s;
+        }
+        .btn-copy.copied {
+            background-color: #32cd32 !important;
+        }
+        /* Кнопка выхода (просто закрывает вкладку) */
+        .btn-close {
+            display: block;
+            width: 120px;
+            margin: 0 auto;
+            background-color: #2d2d2d;
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="window">
+    <div class="title">Уникальный генерируемый маркер:</div>
+    <!-- Поле для маркера, текст readonly но его можно выделить руками -->
+    <input type="text" id="markerField" class="marker-box" readonly>
+    
+    <button id="copyBtn" class="btn-copy">Копировать</button>
+    
+    <button class="btn-close" onclick="window.close();">Выход</button>
+</div>
+
+<script>
+    // Функция для генерации случайного HEX-блока из 4 символов
+    function getRandomHex() {
+        return Math.floor(Math.random() * 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+    }
+
+    // Генерация одного статичного маркера при загрузке страницы
+    const markerField = document.getElementById('markerField');
+    const uniqueKey = `KEY-${getRandomHex()}-${getRandomHex()}-${getRandomHex()}-${getRandomHex()}`;
+    markerField.value = uniqueKey;
+
+    // Логика кнопки автоматического копирования
+    const copyBtn = document.getElementById('copyBtn');
+    copyBtn.addEventListener('click', () => {
+        // Выделяем и копируем текст в буфер обмена
+        markerField.select();
+        markerField.setSelectionRange(0, 99999); // Для мобильных устройств
+        
+        navigator.clipboard.writeText(markerField.value).then(() => {
+            // Эффект успешного копирования (смена текста и цвета)
+            copyBtn.textContent = 'Скопировано!';
+            copyBtn.classList.add('copied');
+        });
+    });
+</script>
+
+</body>
+</html>
