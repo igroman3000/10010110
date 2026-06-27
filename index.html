@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RandomMarker: All in One</title>
+    <title>RandomMarker: Balance Edition</title>
     <style>
         body {
             background-color: #141414;
@@ -18,7 +18,7 @@
         .window {
             background-color: #141414;
             border: 1px solid #333333;
-            width: 420px;
+            width: 440px;
             padding: 20px;
             box-sizing: border-box;
         }
@@ -64,7 +64,7 @@
             padding: 15px;
             font-family: 'Courier New', Courier, monospace;
             font-size: 13px;
-            height: 130px;
+            height: 160px;
             box-sizing: border-box;
             margin-bottom: 20px;
             white-space: pre-wrap;
@@ -88,16 +88,16 @@
 
 <div class="window">
     <!-- ГЕНЕРАТОР -->
-    <div class="title">Раздел 1: Генератор ключей</div>
+    <div class="title">Раздел 1: Генератор случайных ключей</div>
     <input type="text" id="outField" class="input-box" placeholder="Кликните Сгенерировать..." readonly>
-    <button id="genBtn" class="btn">Сгенерировать и копировать</button>
+    <button id="genBtn" class="btn">Сгенерировать и копировать случайный ключ</button>
     
     <!-- ДЕШИФРОВАТЬ -->
-    <div class="title">Раздел 2: Дешифратор ключей</div>
+    <div class="title">Раздел 2: Универсальный дешифратор (UTF-8 + ANSI)</div>
     <input type="text" id="keyInput" class="input-box" placeholder="KEY-XXXX-XXXX-XXXX-XXXX">
-    <button id="decodeBtn" class="btn">Дешифровать в UTF-8</button>
+    <button id="decodeBtn" class="btn">Дешифровать во всех кодировках</button>
     
-    <div class="title">Результат дешифрации (KEY-****-****-****-****):</div>
+    <div class="title">Результаты анализа баланса кодировок:</div>
     <textarea id="resultArea" class="result-area" readonly>Ожидание ввода ключа для анализа...</textarea>
     
     <button class="btn-close" onclick="window.close();">Выход</button>
@@ -116,13 +116,13 @@
         outField.value = uniqueKey;
         
         navigator.clipboard.writeText(uniqueKey).then(() => {
-            genBtn.textContent = 'Готово! Ключ в буфере';
+            genBtn.textContent = 'Успешно скопировано в буфер!';
             genBtn.style.backgroundColor = '#32cd32';
         });
     });
 
     document.getElementById('decodeBtn').addEventListener('click', () => {
-        genBtn.textContent = 'Сгенерировать и копировать';
+        genBtn.textContent = 'Сгенерировать и копировать случайный ключ';
         genBtn.style.backgroundColor = '#00ffff';
 
         const input = document.getElementById('keyInput').value.trim().toUpperCase();
@@ -135,49 +135,57 @@
         }
 
         const parts = input.split('-');
-        if (parts.length !== 5 || parts[0] !== 'KEY') {
+        if (parts.length !== 5 || parts !== 'KEY') {
             resultArea.value = "СТАТУС: ОШИБКА\n\nНеверный формат.\nШаблон: KEY-XXXX-XXXX-XXXX-XXXX";
             resultArea.style.color = "#ff4500";
             return;
         }
 
         const hexRegex = /^[0-9A-F]{4}$/;
-        if (!hexRegex.test(parts[1]) || !hexRegex.test(parts[2]) || !hexRegex.test(parts[3]) || !hexRegex.test(parts[4])) {
+        if (!hexRegex.test(parts) || !hexRegex.test(parts) || !hexRegex.test(parts) || !hexRegex.test(parts)) {
             resultArea.value = "СТАТУС: КРИТИЧЕСКАЯ ОШИБКА\n\nОбнаружены недопустимые не-HEX символы.";
             resultArea.style.color = "#ff4500";
             return;
         }
 
         try {
-            const hexString = parts[1] + parts[2] + parts[3] + parts[4];
+            const hexString = parts + parts + parts + parts;
             const bytes = new Uint8Array(hexString.length / 2);
-            
-            for (let i = 0; i < bytes.length; i++) {
+            for (let i = 0; i < bytes.Length; i++) {
                 bytes[i] = parseInt(hexString.substr(i * 2, 2), 16);
             }
 
-            // Переводим байты в строку через TextDecoder (стандарт UTF-8)
-            const decoder = new TextDecoder('utf-8');
-            const decodedText = decoder.decode(bytes);
+            // 1. Декодирование UTF-8
+            const utf8Decoder = new TextDecoder('utf-8');
+            const utf8Text = utf8Decoder.decode(bytes);
+            let cleanUtf8 = "";
+            for (let char of utf8Text) cleanUtf8 += (char.charCodeAt(0) < 32) ? '?' : char;
+            const padUtf8 = cleanUtf8.padEnd(16, '*');
+            const keyUtf8 = `KEY-${padUtf8.substr(0,4)}-${padUtf8.substr(4,4)}-${padUtf8.substr(8,4)}-${padUtf8.substr(12,4)}`;
 
-            // Заменяем управляющие символы
-            let cleanText = "";
-            for (let char of decodedText) {
-                const code = char.charCodeAt(0);
-                cleanText += (code < 32) ? '?' : char;
+            // 2. Декодирование ANSI (Windows-1251)
+            let ansiText = "";
+            for (let i = 0; i < 8; i++) {
+                let byteVal = bytes[i];
+                if (byteVal >= 0xC0 && byteVal <= 0xFF) ansiText += String.fromCharCode(byteVal + 0x350);
+                else if (byteVal === 0xA8) ansiText += "Ё";
+                else if (byteVal === 0xB8) ansiText += "ё";
+                else ansiText += (byteVal < 32) ? '?' : String.fromCharCode(byteVal);
             }
-
-            // Дополняем и форматируем до KEY-****-****-****-****
-            const paddedText = cleanText.padEnd(16, '*');
-            const finalFormattedKey = `KEY-${paddedText.substr(0,4)}-${paddedText.substr(4,4)}-${paddedText.substr(8,4)}-${paddedText.substr(12,4)}`;
+            const padAnsi = ansiText.padEnd(16, '*');
+            const keyAnsi = `KEY-${padAnsi.substr(0,4)}-${padAnsi.substr(4,4)}-${padAnsi.substr(8,4)}-${padAnsi.substr(12,4)}`;
 
             resultArea.style.color = "#32cd32";
             resultArea.value = 
-                `СТАТУС: УСПЕШНО ДЕШИФРОВАН В UTF-8\n\n` +
-                `Полученный код:\n${finalFormattedKey}\n\n` +
-                `Чистый текст: ${cleanText}`;
+                `СТАТУС: УСПЕШНО РАСШИФРОВАНО\n\n` +
+                `[ВАРИАНТ UTF-8]\n` +
+                `Код : ${keyUtf8}\n` +
+                `Текст: ${cleanUtf8}\n\n` +
+                `[ВАРИАНТ ANSI]\n` +
+                `Код : ${keyAnsi}\n` +
+                `Текст: ${ansiText}`;
         } catch(e) {
-            resultArea.value = "СТАТУС: КРИТИЧЕСКАЯ ОШИБКА\n\nОшибка декодирования UTF-8.";
+            resultArea.value = "СТАТУС: КРИТИЧЕСКАЯ ОШИБКА\n\nОшибка обработки данных.";
             resultArea.style.color = "#ff4500";
         }
     });
